@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Interactive Elementary LEPT 2026 reviewer based on the included PDF.">
+  <title>Elementary LEPT 2026 - Interactive Reviewer</title>
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('lept-theme') || 'dark';
+      const savedAccent = localStorage.getItem('lept-accent');
+      if (/^#[0-9a-f]{6}$/i.test(savedAccent || '')) document.documentElement.style.setProperty('--teal', savedAccent);
+    } catch (_) { document.documentElement.dataset.theme = 'dark'; }
+  </script>
+  <style>
+    :root{color-scheme:dark;--bg:#111418;--side:#181c21;--card:#1d2228;--soft:#242a31;--line:#303740;--ink:#f1f0eb;--dim:#a8adb4;--faint:#737b85;--teal:#3cb6aa;--teal-bg:rgba(60,182,170,.1);--gold:#dba746;--good:#58bd87;--good-bg:rgba(88,189,135,.12);--bad:#e26d5a;--bad-bg:rgba(226,109,90,.12);--serif:Georgia,'Times New Roman',serif;--sans:Inter,Segoe UI,system-ui,sans-serif;--mono:'Cascadia Mono',Consolas,monospace}
+    :root[data-theme="light"]{color-scheme:light;--bg:#f4f1ea;--side:#eae5dc;--card:#fffdf8;--soft:#f3efe7;--line:#d7d0c4;--ink:#242621;--dim:#62665f;--faint:#8a8d86;--teal:#147f78;--teal-bg:rgba(20,127,120,.09);--gold:#a56a19;--good:#287b52;--good-bg:rgba(40,123,82,.1);--bad:#b64b3b;--bad-bg:rgba(182,75,59,.1)}
+    *{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans)}button,input{font:inherit}button{color:inherit}body{display:flex;overflow:hidden}
+    .sidebar{width:286px;min-width:286px;height:100vh;display:flex;flex-direction:column;background:var(--side);border-right:1px solid var(--line);z-index:20}.brand{padding:24px 20px 18px;border-bottom:1px solid var(--line)}.eyebrow,.label{font:600 10px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}.brand h1{font:600 22px/1.12 var(--serif);margin:7px 0 7px}.brand p{font-size:12px;line-height:1.5;color:var(--dim);margin:0}.search{padding:13px 16px;border-bottom:1px solid var(--line)}.search input{width:100%;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink);padding:9px 11px;outline:none}.search input:focus{border-color:var(--teal)}.filters{overflow:auto;padding:10px 0 24px}.group-title{font:600 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--faint);padding:14px 18px 6px}.filter{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;width:100%;padding:9px 18px;border:0;border-left:3px solid transparent;background:transparent;text-align:left;cursor:pointer;font-size:13px;color:var(--dim)}.filter:hover{background:var(--teal-bg);color:var(--ink)}.filter.active{border-left-color:var(--teal);background:var(--teal-bg);color:var(--teal)}.filter small{font:10px var(--mono);color:var(--faint)}
+    .main{height:100vh;min-width:0;flex:1;display:flex;flex-direction:column}.topbar{height:67px;min-height:67px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}.progress-label{font:12px var(--mono);color:var(--dim)}.progress-label b{color:var(--teal)}.top-actions{display:flex;align-items:center;gap:8px;position:relative}.icon-btn,.nav-btn,.action-btn{border:1px solid var(--line);border-radius:7px;background:var(--card);cursor:pointer;padding:8px 12px}.icon-btn:hover,.nav-btn:hover,.action-btn:hover{border-color:var(--teal);color:var(--teal)}.icon-btn.active{border-color:var(--teal);color:var(--teal);background:var(--teal-bg)}.menu{display:none}.score{font:12px var(--mono);color:var(--dim);white-space:nowrap}.score .good{color:var(--good)}.score .bad{color:var(--bad)}
+    .appearance{position:absolute;right:0;top:46px;width:286px;padding:17px;border:1px solid var(--line);border-radius:11px;background:var(--card);box-shadow:0 18px 45px rgba(0,0,0,.3);z-index:40;display:none}.appearance.open{display:block}.appearance h2{font:600 18px var(--serif);margin:0 0 5px}.appearance p{font-size:12px;line-height:1.45;color:var(--dim);margin:0 0 15px}.palette{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:16px}.swatch{width:32px;height:32px;border-radius:50%;border:2px solid var(--card);outline:1px solid var(--line);cursor:pointer;transition:transform .15s}.swatch:hover{transform:scale(1.1)}.swatch.selected{outline:3px solid var(--ink);outline-offset:2px}.custom-color{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid var(--line);font-size:13px}.custom-color input{width:46px;height:32px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--soft);cursor:pointer}.appearance-note{font:10px var(--mono);color:var(--faint);margin-top:12px}
+    .content{overflow:auto;min-width:0;flex:1;padding:42px 24px 34px}.wrap{width:min(800px,100%);max-width:100%;margin:auto}.crumbs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:13px}.chip{padding:5px 8px;border:1px solid var(--line);border-radius:999px;font:10px var(--mono);color:var(--dim);background:var(--soft)}.chip.accent{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 45%,var(--line))}.card{position:relative;max-width:100%;min-width:0;padding:38px 42px 32px;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 18px 50px rgba(0,0,0,.18)}.stamp{position:absolute;right:18px;top:15px;font:10px var(--mono);color:var(--faint)}.q-label{font:600 10px var(--mono);letter-spacing:.15em;color:var(--gold);margin-bottom:10px}.question{font:600 clamp(20px,3vw,27px)/1.35 var(--serif);margin:0 0 28px;overflow-wrap:anywhere}.options{display:grid;gap:10px;min-width:0}.option{display:grid;grid-template-columns:35px minmax(0,1fr);gap:12px;align-items:start;min-width:0;border:1px solid var(--line);border-radius:8px;padding:13px;background:transparent;text-align:left;cursor:pointer;transition:.14s}.option:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}.letter{display:grid;place-items:center;width:29px;height:29px;border:1px solid var(--line);border-radius:6px;font:600 12px var(--mono);color:var(--dim)}.option-text{min-width:0;padding-top:3px;line-height:1.45;overflow-wrap:anywhere}.option.correct{border-color:var(--good);background:var(--good-bg)}.option.wrong{border-color:var(--bad);background:var(--bad-bg)}.option.dim{opacity:.48}.option.correct .letter{background:var(--good);border-color:var(--good);color:#fff}.option.wrong .letter{background:var(--bad);border-color:var(--bad);color:#fff}.rationale{display:none;margin-top:20px;border-left:3px solid var(--teal);padding:12px 15px;background:var(--teal-bg);border-radius:0 7px 7px 0;color:var(--dim);line-height:1.55;font-size:14px}.rationale.show{display:block}.rationale strong{color:var(--teal)}
+    .below{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:17px}.nav-pair{display:flex;gap:8px}.nav-btn:disabled{opacity:.35;cursor:not-allowed}.action-btn.flagged{color:var(--gold);border-color:var(--gold)}.tip{text-align:center;margin-top:22px;color:var(--faint);font:11px var(--mono)}.empty{padding:70px 20px;text-align:center}.empty h2{font:600 27px var(--serif);margin:0 0 9px}.empty p{color:var(--dim)}
+    .finish{display:none;text-align:center;padding:50px 30px}.finish.show{display:block}.finish .ring{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;margin:0 auto 23px;background:conic-gradient(var(--teal) var(--pct),var(--soft) 0);position:relative}.finish .ring:after{content:"";position:absolute;inset:10px;border-radius:50%;background:var(--card)}.finish .ring span{z-index:1;font:600 27px var(--serif)}.finish h2{font:600 29px var(--serif);margin:0 0 8px}.finish p{color:var(--dim)}
+    @media(max-width:760px){.sidebar{position:fixed;left:-292px;transition:left .2s;box-shadow:12px 0 30px rgba(0,0,0,.3)}.sidebar.open{left:0}.menu{display:inline-flex}.main{width:100vw}.topbar{padding:0 14px}.score,.color-label{display:none}.appearance{position:fixed;top:61px;right:10px;width:min(286px,calc(100vw - 20px))}.content{padding:24px 13px;overflow-x:hidden}.card{padding:34px 18px 24px}.question{font-size:21px}.below{align-items:stretch;flex-direction:column}.nav-pair{display:grid;grid-template-columns:1fr 1fr}.nav-btn{width:100%}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="eyebrow">2026 Board Exam Prep</div><h1>Elementary LEPT Reviewer</h1><p>General Education + Professional Education</p></div>
+    <div class="search"><input id="search" type="search" placeholder="Search questions or topics..." aria-label="Search questions"></div>
+    <nav class="filters" id="filters" aria-label="Question filters"></nav>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px"><button class="icon-btn menu" id="menu" aria-label="Open menu">☰</button><div class="progress-label" id="progressLabel">Loading reviewer...</div></div>
+      <div class="top-actions">
+        <div class="score" id="score"></div>
+        <button class="icon-btn" id="appearanceButton" aria-label="Customize colors" aria-expanded="false"><span aria-hidden="true">🎨</span><span class="color-label"> Colors</span></button>
+        <button class="icon-btn" id="theme" aria-label="Change light or dark mode">☀</button>
+        <button class="icon-btn" id="reset" aria-label="Reset all progress">Reset</button>
+        <section class="appearance" id="appearance" aria-label="Appearance settings">
+          <h2>Make it yours</h2>
+          <p>Choose a ready-made accent or create your own color.</p>
+          <div class="palette" id="palette"></div>
+          <label class="custom-color"><span>Custom accent</span><input id="customColor" type="color" value="#3cb6aa" aria-label="Choose a custom accent color"></label>
+          <div class="appearance-note">Your choice is saved on this device.</div>
+        </section>
+      </div>
+    </header>
+    <section class="content" id="content"><div class="wrap" id="app"></div></section>
+  </main>
+  <script src="reviewer-questions.js"></script>
+  <script>
+  (()=>{
+    const questions=window.REVIEWER_QUESTIONS||[],state={filter:'All Questions',index:0,search:'',visible:[],orders:{},progress:load('lept-progress-v1',{}),flags:load('lept-flags-v1',{})};
+    const app=document.querySelector('#app'),filters=document.querySelector('#filters'),search=document.querySelector('#search'),sidebar=document.querySelector('#sidebar');
+    const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function load(k,f){try{return JSON.parse(localStorage.getItem(k))||f}catch(_){return f}} function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}
+    function shuffle(n){const a=[...Array(n).keys()];for(let i=a.length-1;i;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+    function order(q){return state.orders[q.id]||(state.orders[q.id]=shuffle(q.options.length))}
+    function sectionGroup(s){return ['English Communication','Filipino Communication','Philippine History','Life and Works of Rizal','The Contemporary World','Art Appreciation','Science and Technology','Mathematics','Ethics','Understanding the Self'].includes(s)?'General Education':'Professional Education'}
+    const sections=[...new Set(questions.map(q=>q.section))];
+    function stats(list){let answered=0,correct=0;list.forEach(q=>{const p=state.progress[q.id];if(p){answered++;if(p.correct)correct++}});return{answered,correct,total:list.length}}
+    function buildFilters(){
+      const rows=[];const add=(name,list)=>{const s=stats(list);rows.push(`<button class="filter ${state.filter===name?'active':''}" data-filter="${esc(name)}"><span>${esc(name)}</span><small>${s.answered}/${s.total}</small></button>`)};
+      rows.push('<div class="group-title">Question Banks</div>');add('All Questions',questions);add('Mini Drills',questions.filter(q=>q.bank==='Mini Drills'));add('60-Item Mixed Test',questions.filter(q=>q.bank==='60-Item Mixed Test'));add('Flagged',questions.filter(q=>state.flags[q.id]));
+      ['General Education','Professional Education'].forEach(group=>{rows.push(`<div class="group-title">${group}</div>`);sections.filter(s=>sectionGroup(s)===group).forEach(s=>add(s,questions.filter(q=>q.section===s)))});
+      filters.innerHTML=rows.join('');filters.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.index=0;state.search='';search.value='';apply();sidebar.classList.remove('open')});
+    }
+    function baseList(){if(state.filter==='All Questions')return questions;if(state.filter==='Flagged')return questions.filter(q=>state.flags[q.id]);if(state.filter==='Mini Drills'||state.filter==='60-Item Mixed Test')return questions.filter(q=>q.bank===state.filter);return questions.filter(q=>q.section===state.filter)}
+    function apply(){const term=state.search.trim().toLowerCase();state.visible=baseList().filter(q=>!term||[q.question,q.section,...q.options].some(v=>v.toLowerCase().includes(term)));if(state.index>=state.visible.length)state.index=Math.max(0,state.visible.length-1);buildFilters();render()}
+    function score(){const s=stats(baseList()),pct=s.answered?Math.round(s.correct/s.answered*100):0;document.querySelector('#score').innerHTML=`<span class="good">${s.correct} ✓</span> · <span class="bad">${s.answered-s.correct} ✕</span> · ${s.answered}/${s.total}${s.answered?' · '+pct+'%':''}`}
+    function render(){score();const q=state.visible[state.index];const label=document.querySelector('#progressLabel');if(!q){label.textContent='No matching questions';app.innerHTML='<div class="empty"><h2>No questions found</h2><p>Try a different topic or search term.</p></div>';return}
+      label.innerHTML=`Question <b>${state.index+1}</b> of ${state.visible.length}`;const p=state.progress[q.id],ord=order(q);
+      app.innerHTML=`<div class="crumbs"><span class="chip accent">${esc(q.bank)}</span><span class="chip">${esc(sectionGroup(q.section))}</span><span class="chip">${esc(q.section)}</span></div><article class="card"><span class="stamp">${esc(q.id.toUpperCase())}</span><div class="q-label">Question</div><h2 class="question">${esc(q.question)}</h2><div class="options">${ord.map((oi,pos)=>{let cls='';if(p)cls=oi===q.answer?'correct':oi===p.chosen?'wrong':'dim';return`<button class="option ${cls}" data-choice="${oi}" ${p?'disabled':''}><span class="letter">${String.fromCharCode(65+pos)}</span><span class="option-text">${esc(q.options[oi])}</span></button>`}).join('')}</div><div class="rationale ${p?'show':''}"><strong>${p?(p.correct?'Correct.':'The correct answer is '+String.fromCharCode(65+ord.indexOf(q.answer))+'.'):''}</strong> ${p?esc(q.explanation):''}</div></article><div class="below"><button class="action-btn ${state.flags[q.id]?'flagged':''}" id="flag">${state.flags[q.id]?'★ Flagged':'☆ Flag for review'}</button><div class="nav-pair"><button class="nav-btn" id="prev" ${state.index===0?'disabled':''}>← Previous</button><button class="nav-btn" id="next" ${state.index===state.visible.length-1?'disabled':''}>Next →</button></div></div><div class="tip">Keyboard: A-D or 1-4 to answer · ← → to navigate</div>`;
+      app.querySelectorAll('.option').forEach(b=>b.onclick=()=>answer(q,Number(b.dataset.choice)));document.querySelector('#prev').onclick=()=>move(-1);document.querySelector('#next').onclick=()=>move(1);document.querySelector('#flag').onclick=()=>{state.flags[q.id]=!state.flags[q.id];save('lept-flags-v1',state.flags);buildFilters();render()};
+    }
+    function answer(q,chosen){if(state.progress[q.id])return;state.progress[q.id]={chosen,correct:chosen===q.answer};save('lept-progress-v1',state.progress);buildFilters();render()}
+    function move(n){const next=state.index+n;if(next>=0&&next<state.visible.length){state.index=next;document.querySelector('#content').scrollTop=0;render()}}
+    search.oninput=e=>{state.search=e.target.value;state.index=0;apply()};document.querySelector('#menu').onclick=()=>sidebar.classList.toggle('open');
+    const appearance=document.querySelector('#appearance'),appearanceButton=document.querySelector('#appearanceButton'),customColor=document.querySelector('#customColor');
+    const accents=[['Teal','#3cb6aa'],['Pink','#ec78ad'],['Rose','#e76578'],['Purple','#a986e8'],['Blue','#5d9fe8'],['Orange','#e79a4b']];
+    let currentAccent=localStorage.getItem('lept-accent')||'#3cb6aa';
+    function accentWash(hex,alpha=.11){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${n>>8&255},${n&255},${alpha})`}
+    function setAccent(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return;currentAccent=hex.toLowerCase();document.documentElement.style.setProperty('--teal',currentAccent);document.documentElement.style.setProperty('--teal-bg',accentWash(currentAccent));customColor.value=currentAccent;localStorage.setItem('lept-accent',currentAccent);document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('selected',s.dataset.color===currentAccent));}
+    document.querySelector('#palette').innerHTML=accents.map(([name,color])=>`<button class="swatch" style="background:${color}" data-color="${color}" title="${name}" aria-label="Use ${name} accent"></button>`).join('');document.querySelectorAll('.swatch').forEach(s=>s.onclick=()=>setAccent(s.dataset.color));customColor.oninput=e=>setAccent(e.target.value);setAccent(currentAccent);
+    appearanceButton.onclick=e=>{e.stopPropagation();const open=appearance.classList.toggle('open');appearanceButton.classList.toggle('active',open);appearanceButton.setAttribute('aria-expanded',String(open))};appearance.onclick=e=>e.stopPropagation();document.addEventListener('click',()=>{appearance.classList.remove('open');appearanceButton.classList.remove('active');appearanceButton.setAttribute('aria-expanded','false')});
+    document.querySelector('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;localStorage.setItem('lept-theme',t);document.querySelector('#theme').textContent=t==='light'?'☾':'☀';setAccent(currentAccent)};document.querySelector('#theme').textContent=document.documentElement.dataset.theme==='light'?'☾':'☀';
+    document.querySelector('#reset').onclick=()=>{if(confirm('Clear all saved answers and flags?')){state.progress={};state.flags={};state.orders={};save('lept-progress-v1',{});save('lept-flags-v1',{});apply()}};
+    document.addEventListener('keydown',e=>{if(document.activeElement===search)return;if(e.key==='ArrowLeft')move(-1);else if(e.key==='ArrowRight')move(1);else{let n=/^[a-d]$/i.test(e.key)?e.key.toLowerCase().charCodeAt(0)-97:/^[1-4]$/.test(e.key)?Number(e.key)-1:-1;if(n>=0&&state.visible[state.index]){const q=state.visible[state.index],ord=order(q);answer(q,ord[n])}}});
+    apply();
+  })();
+  </script>
+</body>
+</html>

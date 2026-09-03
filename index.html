@@ -76,7 +76,9 @@
     function stats(list){let answered=0,correct=0;list.forEach(q=>{const p=state.progress[q.id];if(p){answered++;if(p.correct)correct++}});return{answered,correct,total:list.length}}
     function buildFilters(){
       const rows=[];const add=(name,list)=>{const s=stats(list);rows.push(`<button class="filter ${state.filter===name?'active':''}" data-filter="${esc(name)}"><span>${esc(name)}</span><small>${s.answered}/${s.total}</small></button>`)};
-      rows.push('<div class="group-title">Question Banks</div>');add('All Questions',questions);[...new Set(questions.map(q=>q.bank))].forEach(bank=>add(bank,questions.filter(q=>q.bank===bank)));add('Flagged',questions.filter(q=>state.flags[q.id]));
+      const banks=[...new Set(questions.map(q=>q.bank))],melvinBanks=banks.filter(bank=>bank.startsWith('Melvin Session')),reviewerBanks=banks.filter(bank=>!bank.startsWith('Melvin Session'));
+      rows.push('<div class="group-title">Reviewer Sets</div>');add('All Questions',questions);reviewerBanks.forEach(bank=>add(bank,questions.filter(q=>q.bank===bank)));add('Flagged',questions.filter(q=>state.flags[q.id]));
+      rows.push('<div class="group-title">Melvin Sessions</div>');melvinBanks.forEach(bank=>add(bank,questions.filter(q=>q.bank===bank)));
       ['General Education','Professional Education'].forEach(group=>{rows.push(`<div class="group-title">${group}</div>`);sections.filter(s=>sectionGroup(s)===group).forEach(s=>add(s,questions.filter(q=>q.section===s)))});
       filters.innerHTML=rows.join('');filters.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.index=0;state.search='';search.value='';apply();sidebar.classList.remove('open')});
     }

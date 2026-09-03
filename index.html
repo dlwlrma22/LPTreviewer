@@ -62,6 +62,7 @@
     <section class="content" id="content"><div class="wrap" id="app"></div></section>
   </main>
   <script src="reviewer-questions.js"></script>
+  <script src="melvin-questions.js"></script>
   <script>
   (()=>{
     const questions=window.REVIEWER_QUESTIONS||[],state={filter:'All Questions',index:0,search:'',visible:[],orders:{},progress:load('lept-progress-v1',{}),flags:load('lept-flags-v1',{})};
@@ -75,11 +76,11 @@
     function stats(list){let answered=0,correct=0;list.forEach(q=>{const p=state.progress[q.id];if(p){answered++;if(p.correct)correct++}});return{answered,correct,total:list.length}}
     function buildFilters(){
       const rows=[];const add=(name,list)=>{const s=stats(list);rows.push(`<button class="filter ${state.filter===name?'active':''}" data-filter="${esc(name)}"><span>${esc(name)}</span><small>${s.answered}/${s.total}</small></button>`)};
-      rows.push('<div class="group-title">Question Banks</div>');add('All Questions',questions);add('Mini Drills',questions.filter(q=>q.bank==='Mini Drills'));add('60-Item Mixed Test',questions.filter(q=>q.bank==='60-Item Mixed Test'));add('Flagged',questions.filter(q=>state.flags[q.id]));
+      rows.push('<div class="group-title">Question Banks</div>');add('All Questions',questions);[...new Set(questions.map(q=>q.bank))].forEach(bank=>add(bank,questions.filter(q=>q.bank===bank)));add('Flagged',questions.filter(q=>state.flags[q.id]));
       ['General Education','Professional Education'].forEach(group=>{rows.push(`<div class="group-title">${group}</div>`);sections.filter(s=>sectionGroup(s)===group).forEach(s=>add(s,questions.filter(q=>q.section===s)))});
       filters.innerHTML=rows.join('');filters.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.index=0;state.search='';search.value='';apply();sidebar.classList.remove('open')});
     }
-    function baseList(){if(state.filter==='All Questions')return questions;if(state.filter==='Flagged')return questions.filter(q=>state.flags[q.id]);if(state.filter==='Mini Drills'||state.filter==='60-Item Mixed Test')return questions.filter(q=>q.bank===state.filter);return questions.filter(q=>q.section===state.filter)}
+    function baseList(){if(state.filter==='All Questions')return questions;if(state.filter==='Flagged')return questions.filter(q=>state.flags[q.id]);if(questions.some(q=>q.bank===state.filter))return questions.filter(q=>q.bank===state.filter);return questions.filter(q=>q.section===state.filter)}
     function apply(){const term=state.search.trim().toLowerCase();state.visible=baseList().filter(q=>!term||[q.question,q.section,...q.options].some(v=>v.toLowerCase().includes(term)));if(state.index>=state.visible.length)state.index=Math.max(0,state.visible.length-1);buildFilters();render()}
     function score(){const s=stats(baseList()),pct=s.answered?Math.round(s.correct/s.answered*100):0;document.querySelector('#score').innerHTML=`<span class="good">${s.correct} ✓</span> · <span class="bad">${s.answered-s.correct} ✕</span> · ${s.answered}/${s.total}${s.answered?' · '+pct+'%':''}`}
     function render(){score();const q=state.visible[state.index];const label=document.querySelector('#progressLabel');if(!q){label.textContent='No matching questions';app.innerHTML='<div class="empty"><h2>No questions found</h2><p>Try a different topic or search term.</p></div>';return}

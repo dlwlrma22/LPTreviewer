@@ -1,0 +1,6 @@
+generated/transcripts/
+generated/questions/
+generated/backups/
+tools/transcript-generator/.venv/
+tools/transcript-generator/__pycache__/
+*.pyc
